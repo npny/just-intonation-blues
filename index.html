@@ -1,0 +1,177 @@
+<html>
+<head>
+<title>Minor Blues Pentatonic Just Intonation Keyboard</title>
+</head>
+<body>
+
+<input type="range" id="outputVolume" />
+<p>
+	Keys 1 to -, A to $, Q to `<br>
+	Change the base frequency by running something like generateScale(A) or generateScale(440.0)
+</p>
+
+<script type="text/javascript">
+	const A = 440,
+	B = 495,
+	C = 528,
+	D = 586,
+	E = 660,
+	F = 705,
+	G = 793;
+
+	function generateJIFrequencies(baseFrequency) {
+		
+		const majorScale = [
+			1/1,
+			9/8,
+			5/4,
+			4/3,
+			3/2,
+			5/3,
+			15/8,
+			2/1
+		];
+
+		const chromaticScale = [
+			1/1,
+			16/15,
+			9/8,
+			6/5,
+			5/4,
+			4/3,
+			7/5,
+			3/2,
+			8/5,
+			5/3,
+			16/9,
+			15/8,
+		]
+
+		const equalScale = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(x => Math.pow(2, x/12));
+
+		const minorBluesScale = [
+			1/1,
+			6/5,
+
+			4/3,
+			7/5,
+			3/2,
+
+			16/9,
+			15/8,
+			2/1,
+			
+			2/1,
+			2/1,
+			2/1,
+			2/1,
+		]
+
+
+		return minorBluesScale.map(x => baseFrequency*x);
+		//return equalScale.map(x => baseFrequency*x);
+	}
+</script>
+
+<script>
+
+	const context = new (window.AudioContext || window.webkitAudioContext)();
+	const outputNode = context.createGain();
+	outputNode.gain.value = .1;
+	outputNode.connect(context.destination);
+
+	const range = document.getElementById("outputVolume");
+	range.style.width = 500;
+	range.min = 0.0;
+	range.max = 2.0;
+	range.step = .1;
+	range.value = .1;
+	range.oninput = () => outputNode.gain.value = range.value;
+
+
+
+	function createSource(frequency) {
+
+		const output = context.createGain();
+		output.gain.value = 0.0;
+
+		// For now just a single oscillator, but a few more harmonics and a more complex effect network would produce a richer sound
+		const oscillator = context.createOscillator();
+		oscillator.type = "square"; // "square", "triangle", "sawtooth", "sine"
+		oscillator.frequency.value = frequency;
+		oscillator.start();
+		oscillator.connect(output)
+		
+
+		return output;
+	}
+
+
+
+
+	const sources = [];
+	function generateScale(baseFrequency) {
+		
+		resetSources();
+
+		const frequencies = generateJIFrequencies(baseFrequency/2)
+		.concat(generateJIFrequencies(baseFrequency))
+		.concat(generateJIFrequencies(baseFrequency*2));
+
+		frequencies.forEach(frequency => {
+			const source = createSource(frequency);
+			source.connect(outputNode);
+			sources.push(source);
+		});
+
+	}
+
+
+	function resetSources() {
+		sources.forEach(s => s.disconnect(outputNode));
+		sources.splice(0, sources.length);
+	}
+
+
+	function bindKeys() {
+		const keyCodes = [81, 83, 68, 70, 71, 72, 74, 75, 76, 77, 222, 220, 65, 90, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 49, 50, 222, 222, 53, 54, 55, 56, 57, 48, 189, 189];
+		const keyChars = ["U+0051", "U+0053", "U+0044", "U+0046", "U+0047", "U+0048", "U+004A", "U+004B", "U+004C", "U+004D", "U+00F9", "Unidentified", "U+0041", "U+005A", "U+0045", "U+0052", "U+0054", "U+0059", "U+0055", "U+0049", "U+004F", "U+0050", "Unidentified", "U+0024", "U+0026", "U+00E9", "U+0022", "U+0027", "U+0028", "U+00A7", "U+00E8", "U+0021", "U+00E7", "U+00E0", "U+0029", "U+002D"];
+		const keyNames = ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyK", "KeyL", "Semicolon", "Quote", "Backslash", "KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "KeyI", "KeyO", "KeyP", "BracketLeft", "BracketRight", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Digit0", "Minus", "Equal"];
+		
+		const map = {};
+		keyNames.forEach((c, i) => map[c] = i);
+		console.log(map);
+
+		["keydown", "keyup"].forEach(eventType => {
+			document.addEventListener(eventType, e => {
+				//e.preventDefault();
+				const indentifier = e.code;
+
+				if(indentifier in map) {
+					const index = map[indentifier];
+					//console.log(index);
+
+					if(index < sources.length)
+						sources[index].gain.value = (e.type == "keydown" ? 1.0 : 0.0);
+				}
+
+			})
+		});
+	}
+
+
+	function init() {
+		generateScale(440.0);
+		bindKeys();
+	}
+
+	//const array = [];
+	//document.addEventListener("keydown", e => array.push(e.keyIdentifier));
+	//document.addEventListener("keydown", e => console.log(e.keyCode));
+
+	init();
+
+</script>
+
+</body>
+</html>
