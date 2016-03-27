@@ -29,7 +29,7 @@ const padToRow = (scale, size) => {
 // Harmonic keyboard
 // Where going up one row or right six keys brings you a perfect fifth higher.
 // This is somewhat related to the system used on guitars (going up one string or right 5 frets brings you a fourth higher)
-// This keyboard is all neat and mathematical, but it lacks a blues note, a semitone, contains redundant notes (octaves and fifth), and contains non-standard intervals (on the OP^$ keys)
+// This keyboard is all neat and mathematical, but it lacks a blue note, a semitone, contains redundant notes (octaves and fifths), and contains non-standard intervals (on the OP^$ keys)
 
 const harmonicSerie = [
 	1 + 0,
@@ -63,7 +63,7 @@ const justScale = [
 	1.2,		// 3 Minor third
 	1.25,		// 4 Major third
 	1.3333333,  // 5 Fourth
-	1.40625,	// 6 Blues note
+	1.40625,	// 6 Blue note
 	1.5,		// 7 Fifth
 	1.59375,	// 8
 	1.6875,		// 9

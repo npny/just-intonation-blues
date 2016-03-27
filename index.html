@@ -7,17 +7,31 @@
 <input type="range" id="outputVolume" />
 <p>
 	Keys 1 to -, A to $, Q to `<br>
-	Change the base frequency or keyboard type by running something like changeKeyboard(440.0, harmonicKeyboard) or changeKeyboard(D, bluesKeyboard)
+	Change the base frequency or keyboard type by running something like changeKeyboard(440.0, harmonicKeyboard) or changeKeyboard("D3", bluesKeyboard)
 </p>
 
 <script type="text/javascript">
-	const A = 440,
-	B = 495,
-	C = 528,
-	D = 586,
-	E = 660,
-	F = 705,
-	G = 793;
+	const standardFrequencies = {
+		"C":	261.63,
+ 		"C#":	277.18,
+		"D":	293.66,
+ 		"D#":	311.13,
+		"E":	329.63,
+		"F":	349.23,
+ 		"F#":	369.99,
+		"G":	392.00,
+ 		"G#":	415.30,
+		"A":	440.00,
+ 		"A#":	466.16,
+	};
+
+	// Extend standard
+	Object.keys(standardFrequencies).forEach(k => {
+		for(var i = 0; i <= 4; i++) {
+			standardFrequencies[k + (4+i)] = standardFrequencies[k] * Math.pow(2, i);
+			standardFrequencies[k + (4-i)] = standardFrequencies[k] / Math.pow(2, i);
+		}
+	})
 </script>
 
 <script type="text/javascript" src="keyboard.js"></script>
@@ -40,10 +54,11 @@
 	range.oninput = () => context.masterOut.gain.value = range.value;
 
 
-
-
 	function changeKeyboard(baseFrequency, ratioKeyMap) {
 		
+		if(typeof baseFrequency === "string")
+			baseFrequency = standardFrequencies[baseFrequency];
+
 		for(var k in sourceKeyMap)
 			sourceKeyMap[k].kill();
 
@@ -52,12 +67,15 @@
 		for(var k in ratioKeyMap)
 			sourceKeyMap[k] = createSource(ratioKeyMap[k] * baseFrequency)
 
+		// Bind space to the tonic
+		sourceKeyMap["Space"] = sourceKeyMap["KeyA"];
+
 	}
 
 
 	function init() {
 		//changeKeyboard(440.0, harmonicKeyboard);
-		changeKeyboard(D/4, bluesKeyboard);
+		changeKeyboard("D3", bluesKeyboard);
 	}
 
 	//const array = [];
