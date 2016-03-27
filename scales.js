@@ -1,3 +1,28 @@
+const standardFrequencies = {
+	"C": 261.63,
+	"C#": 277.18,
+	"D": 293.66,
+	"D#": 311.13,
+	"E": 329.63,
+	"F": 349.23,
+	"F#": 369.99,
+	"G": 392.00,
+	"G#": 415.30,
+	"A": 440.00,
+	"A#": 466.16,
+	"B": 493.88,
+};
+
+// Extend standard
+Object.keys(standardFrequencies).forEach(k => {
+	for(var i = 0; i <= 4; i++) {
+		standardFrequencies[k + (4+i)] = standardFrequencies[k] * Math.pow(2, i);
+		standardFrequencies[k + (4-i)] = standardFrequencies[k] / Math.pow(2, i);
+	}
+});
+
+
+
 // Multiply every item of a list by a number
 const mul = (list, n) => list.map(x => x * n);
 
@@ -73,23 +98,12 @@ const justScale = [
 
 
 // Notes 1 to 12, one octave per row
-const equalKeyboard = map(
+const flatKeyboard = sourceScale => map(
 	flatten( reducedKeyboard ),
 	[].concat(
-		mul( equalScale, 4 ),
-		mul( equalScale, 2 ),
-		mul( equalScale, 1 )
-	)
-)
-
-
-// Notes 1 to 12, one octave per row
-const justKeyboard = map(
-	flatten( reducedKeyboard ),
-	[].concat(
-		mul( justScale, 4 ),
-		mul( justScale, 2 ),
-		mul( justScale, 1 )
+		mul( sourceScale, 4 ),
+		mul( sourceScale, 2 ),
+		mul( sourceScale, 1 )
 	)
 )
 

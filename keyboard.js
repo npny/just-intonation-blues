@@ -21,10 +21,31 @@ var sourceKeyMap = {};
 
 const handler = e => {
 	e.preventDefault();
-	//console.log(e.code);
+
 	if(sourceKeyMap[e.code])
 		sourceKeyMap[e.code][e.type == "keydown" ? "turnOn" : "turnOff"]();
 }
 
 document.addEventListener("keydown", handler);
 document.addEventListener("keyup", handler);
+
+
+
+function changeKeyboard(baseFrequency, ratioKeyMap) {
+	console.log(ratioKeyMap)
+	
+	if(typeof baseFrequency === "string")
+		baseFrequency = standardFrequencies[baseFrequency];
+
+	for(var k in sourceKeyMap)
+		sourceKeyMap[k].kill();
+
+	sourceKeyMap = {};
+
+	for(var k in ratioKeyMap)
+		sourceKeyMap[k] = createSource(ratioKeyMap[k] * baseFrequency)
+
+	// Bind space to the tonic
+	sourceKeyMap["Space"] = sourceKeyMap["KeyA"];
+
+}

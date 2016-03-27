@@ -6,85 +6,23 @@
 
 <input type="range" id="outputVolume" />
 <p>
-	Keys 1 to -, A to $, Q to `<br>
-	Change the base frequency or keyboard type by running something like changeKeyboard(440.0, harmonicKeyboard) or changeKeyboard("D3", bluesKeyboard)
+	Play with the keys 1 to -, A to $, and Q to ` (the first three top rows of your keyboard)<br>
+	Select what you want below (you can get more control by calling changeKeyboard() directly).<br>
+	Note : You can change tonality up and down by using Tab / Shift+Tab<br>
 </p>
+<div id="controls"></div>
 
-<script type="text/javascript">
-	const standardFrequencies = {
-		"C":	261.63,
- 		"C#":	277.18,
-		"D":	293.66,
- 		"D#":	311.13,
-		"E":	329.63,
-		"F":	349.23,
- 		"F#":	369.99,
-		"G":	392.00,
- 		"G#":	415.30,
-		"A":	440.00,
- 		"A#":	466.16,
-	};
-
-	// Extend standard
-	Object.keys(standardFrequencies).forEach(k => {
-		for(var i = 0; i <= 4; i++) {
-			standardFrequencies[k + (4+i)] = standardFrequencies[k] * Math.pow(2, i);
-			standardFrequencies[k + (4-i)] = standardFrequencies[k] / Math.pow(2, i);
-		}
-	})
-</script>
-
-<script type="text/javascript" src="keyboard.js"></script>
-<script type="text/javascript" src="scales.js"></script>
-<script type="text/javascript" src="source.js"></script>
 
 <script>
-
 	const context = new (window.AudioContext || window.webkitAudioContext)();
 	context.masterOut = context.createGain();
 	context.masterOut.gain.value = .1;
 	context.masterOut.connect(context.destination);
-
-	const range = document.getElementById("outputVolume");
-	range.style.width = 500;
-	range.min = 0.0;
-	range.max = 2.0;
-	range.step = .1;
-	range.value = .1;
-	range.oninput = () => context.masterOut.gain.value = range.value;
-
-
-	function changeKeyboard(baseFrequency, ratioKeyMap) {
-		
-		if(typeof baseFrequency === "string")
-			baseFrequency = standardFrequencies[baseFrequency];
-
-		for(var k in sourceKeyMap)
-			sourceKeyMap[k].kill();
-
-		sourceKeyMap = {};
-
-		for(var k in ratioKeyMap)
-			sourceKeyMap[k] = createSource(ratioKeyMap[k] * baseFrequency)
-
-		// Bind space to the tonic
-		sourceKeyMap["Space"] = sourceKeyMap["KeyA"];
-
-	}
-
-
-	function init() {
-		//changeKeyboard(440.0, harmonicKeyboard);
-		changeKeyboard("D3", bluesKeyboard);
-	}
-
-	//const array = [];
-	//document.addEventListener("keydown", e => array.push(e.code));
-	//document.addEventListener("keydown", e => console.log(e.keyCode));
-
-	init();
-
 </script>
+<script type="text/javascript" src="keyboard.js"></script>
+<script type="text/javascript" src="scales.js"></script>
+<script type="text/javascript" src="source.js"></script>
+<script type="text/javascript" src="ui.js"></script>
 
 </body>
 </html>
