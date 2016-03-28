@@ -8,7 +8,7 @@ const status = document.querySelector("#groovy-charles .text-status");
 function loadCharles() {
 	for(var i = 0; i < 12; i++) {
 		const img = document.createElement("img");
-		img.src = "groovy-charles/" + i + ".png";
+		img.src = i + ".png";
 		imagesContainer.appendChild(img);
 	}
 

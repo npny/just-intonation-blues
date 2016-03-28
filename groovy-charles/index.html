@@ -1,0 +1,192 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Ray Charles Groovy Challenge</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<style>
+		body {
+			background: #0D0D0D;
+			color: #999999;
+			font-family: Georgia, serif;
+			margin: 0;
+			height: 100vh;
+		}
+
+		#controls {
+			display: flex;
+			justify-content: center;
+			margin-top: 20px;
+		}
+
+		#controls select {
+			width: 100%;
+		}
+
+		#controls > div:first-child {
+			width: 200px;
+			display: flex;
+			justify-content: center;
+			flex-direction: column;
+		}
+
+		#controls > div:first-child > div {
+			display: flex;
+		}
+
+
+		#tonality-input {width: 6em;}
+		#output-volume {
+			width: 100%;
+		}
+
+		#first-screen {
+			height: 100vh;
+			width: 100%;
+			position: relative;
+
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			align-items: center;
+		}
+
+
+		#presentation {
+			flex: 1;
+			width: 50%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+
+		}
+
+		#presentation.done #groovy-charles {opacity: 1; position: relative;}
+		#presentation.done pre {display: none;}
+
+
+		pre {
+			padding: 10px 20px;
+    		margin: 0;
+    		font-size: 12px;
+    		font-family: Georgia;
+		}
+
+		#presentation pre {
+    		width: 100%;
+		}
+
+		#groovy-charles {
+			position: absolute;
+			width: auto;
+			opacity: 0;
+			transition: opacity 1s;
+		}
+
+	
+
+		
+
+	</style>
+</head>
+<body>
+
+<section id="first-screen">
+
+<div id="presentation">
+
+<pre style="text-align: center;">
+Use the keys 1 to -, A to $, and Q to `
+(the three top rows of your keyboard)
+
+Pretty much any note will sound right,
+but that doesn't mean mashing keys at
+random is going to sound better than
+giving your jam a little thought
+
+Try holding a chord (e.g. Space + G),
+looping 2-3 notes fast (e.g. RTY),
+or sliding your finger around.
+
+Experiment !
+
+<button onclick="document.getElementById('presentation').className = 'done'">I get it</button>
+</pre>
+
+	<div id="groovy-charles">
+		<div class="images-container"></div>
+		<div class="text-status"></div>
+		<div class="gauge-container">
+			<div class="gauge"></div>
+		</div>
+		<label>Groove-o-meter</label>
+		<script type="text/javascript" src="challenge.js"></script>
+	</div>
+
+</div>
+
+
+
+<iframe width="100%" height="160" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/140910621&amp;auto_play=true&amp;hide_related=false&amp;show_comments=false&amp;show_user=false&amp;show_reposts=false&amp;visual=true"></iframe>
+
+</section>
+
+<div id="controls">
+	<div>
+		<div>
+			<input id="tonality-input" type="number" value=440>
+			<select id="tonality-select"></select>
+		</div>
+		<select id="intonation-select"></select>
+		<select id="scale-select"></select>
+	</div>
+	<div>
+		<input type="range" id="output-volume" />
+<pre>
+- Adjust output volume
+- Select a tonality/key (base frequency for the keyboard).
+- Select what intonation you want to use
+- Select which particular scale / keyboard layout you want.
+
+Tips :
+- You can change the tonality to the next standard frequency by using the Up/Down arrow
+- You can press space to play the base frequency
+- Some keys can't be pressed simultaneously. Use multiple keyboards !
+</pre>
+	</div>
+</div>
+
+
+
+
+<script>
+	const context = new (window.AudioContext || window.webkitAudioContext)();
+	context.masterOut = context.createGain();
+	context.masterOut.gain.value = .1;
+	context.masterOut.connect(context.destination);
+</script>
+<script type="text/javascript" src="../keyboard.js"></script>
+<script type="text/javascript" src="../scales.js"></script>
+<script type="text/javascript" src="../source.js"></script>
+<script type="text/javascript" src="../ui.js"></script>
+<script>
+
+	function init() {
+
+		tonalityInput.value = standardFrequencies["C"];
+		tonalitySelect.value = "C";
+		intonationSelect.value = "just";
+		scaleSelect.value = "minorBlues";
+		//scaleSelect.value = "multiKeyboard";
+
+		controls.addEventListener("change", updateKeyboard);
+		updateKeyboard();
+
+	}
+
+	init();
+
+</script>
+
+</body>
+</html>

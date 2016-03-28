@@ -28,8 +28,8 @@ range.min = 0.0;
 range.max = 2.0;
 range.step = .1;
 range.value = .1;
-range.oninput = () => context.masterOut.gain.value = range.value;
-
+range.addEventListener("input", e => context.masterOut.gain.value = range.value);
+range.addEventListener("change", e => e.stopPropagation());
 
 
 // "Enter a base frequency (tonality) or select a standard one"
@@ -85,20 +85,6 @@ function updateKeyboard() {
 	changeKeyboard(tonality, keyboard);
 }
 
-
-function init() {
-
-	tonalityInput.value = standardFrequencies["C"];
-	tonalitySelect.value = "C";
-	intonationSelect.value = "just";
-	scaleSelect.value = "minorBlues";
-
-	controls.addEventListener("change", updateKeyboard);
-	updateKeyboard();
-
-}
-
-init();
 
 
 // Convenience features
