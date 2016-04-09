@@ -35,23 +35,38 @@
 			width: 100%;
 		}
 
+		#canvas {
+			width: 100vw;
+			height: 100vh;
+		}
+
+		#frequency-pad {
+			position: absolute;
+			bottom: 0;
+			right: 0;
+		}
+		#frequency-pad sup {margin-right: -1ex;}
+		#frequency-pad td {
+			color: rgb( 128, 203, 196 );
+			width: 2em;
+			height: 3em;
+			padding: 0.6em;
+			text-align: center;
+		}
+
+		#frequency-pad tr:nth-child(2), #frequency-pad tr:nth-last-child(2) {opacity: .5;}
+		#frequency-pad td:nth-child(2), #frequency-pad td:nth-last-child(2) {opacity: .5;}
+
 	</style>
 </head>
 <body>
 
+<table id="frequency-pad"></table>
+
+<canvas id="canvas" width="100vw"></canvas>
 
 <div id="controls">
-	<div>
-		<div>
-			<input id="tonality-input" type="number" value=440>
-			<select id="tonality-select"></select>
-		</div>
-		<select id="intonation-select"></select>
-		<select id="scale-select"></select>
-	</div>
-	<div>
-		<input type="range" id="output-volume" />
-	</div>
+	<input type="range" id="output-volume" value=".1"/>
 </div>
 
 
@@ -62,22 +77,49 @@
 	context.masterOut.gain.value = .1;
 	context.masterOut.connect(context.destination);
 </script>
+
 <script type="text/javascript" src="keyboard.js"></script>
-<script type="text/javascript" src="scales.js"></script>
-<script type="text/javascript" src="source.js"></script>
+<script type="text/javascript" src="key.js"></script>
+<script type="text/javascript" src="organ.js"></script>
 <script type="text/javascript" src="ui.js"></script>
+<script type="text/javascript" src="spectrogram.js"></script>
+
 <script>
 
 	function init() {
 
-		tonalityInput.value = standardFrequencies["C"];
-		tonalitySelect.value = "C";
-		intonationSelect.value = "just";
-		scaleSelect.value = "minorBlues";
-		//scaleSelect.value = "multiKeyboard";
+		const analyserNode = context.createAnalyser();
+		window.analyserNode = analyserNode;
+		analyserNode.fftSize = Math.pow(2, 11); // 10-15
+		analyserNode.smoothingTimeConstant = .0//01;//0.0001;
 
-		controls.addEventListener("change", updateKeyboard);
-		updateKeyboard();
+		//Organ.output.connect(analyserNode);
+
+		const canvas = document.getElementById("canvas");
+		canvas.height = canvas.clientHeight;
+		canvas.width = canvas.clientWidth;
+		window.spectrogram = new Spectrogram(analyserNode, canvas);
+
+		/*
+		navigator.getUserMedia_ = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+		navigator.getUserMedia_({audio: true}, function(stream) {
+			context.masterIn = context.createMediaStreamSource(stream);
+			//context.masterIn.connect(analyserNode);
+		}, e => console.log(e));
+		*/
+		
+		const dummyOscillator = context.createOscillator();
+		dummyOscillator.frequency.value = 0;
+		dummyOscillator.start();
+		dummyOscillator.connect(analyserNode);
+		context.masterOut.connect(analyserNode);
+
+		Organ.init();
+		Organ.setScale(minorBluesScale_Just2);
+		Organ.output.connect(context.masterOut);
+
+		UI.setBaseNoteIndex(12);
+
 
 	}
 
