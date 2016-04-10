@@ -68,8 +68,10 @@ Spectrogram.prototype.recomputeDrawRects = function() {
 		for(var i = 0; i < range; i++) {
 			this.drawList.push({
 				binIndex: startIndex+i,
-				x: i*binWidth,
+				//x: Math.log2( i/range + 1 ) * canvasWidth,
+				x: (i-.5)*binWidth,
 				y: canvasHeight - row*octaveHeight,
+				//width: ( Math.log2( (i+1) / range + 1 ) - Math.log2( i/range + 1 ) ) * canvasWidth,
 				width: binWidth,
 				height: -octaveHeight,
 				hue: (i/range)*360,
@@ -84,16 +86,22 @@ Spectrogram.prototype.recomputeDrawRects = function() {
 Spectrogram.prototype.update = function() {
 
 	this.analyserNode.getFloatFrequencyData( this.dataBuffer );
-	this.render();
+	this.clear();
+	this.renderSpectrogram();
+	this.renderSpectralLines();
 	requestAnimationFrame( () => this.update() );
 
 }
 
-
-Spectrogram.prototype.render = function() {
+Spectrogram.prototype.clear = function() {
 
 	this.canvasContext.fillStyle = "rgb( 38, 50, 56 )";
 	this.canvasContext.fillRect( 0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.width);
+
+}
+
+
+Spectrogram.prototype.renderSpectrogram = function() {
 
 	for(var i = 0; i < this.drawList.length; i++) {
 
@@ -111,6 +119,37 @@ Spectrogram.prototype.render = function() {
 		const width = Math.round(drawRect.x + drawRect.width) - x;
 		const height = Math.round(drawRect.y + drawRect.height) - y;
 		this.canvasContext.fillRect( x, y, width, height );
+
+	}
+
+}
+
+
+Spectrogram.prototype.renderSpectralLines = function() {
+
+	for(var i = 0; i < Organ.keys.length; i++) {
+		//if(!Organ.keys[sourceKeyMap[k]]) continue;
+
+		const freq = Organ.keys[i].frequency;
+		const octaveIndex = Math.floor(Math.log2(freq / this.baseFrequency));
+		const octaveLow = Math.pow(2, octaveIndex) * this.baseFrequency;
+		const octaveHigh = octaveLow*2;
+
+		const height = this.canvasContext.canvas.height / this.octaveCount;
+		const top = this.canvasContext.canvas.height - (height * octaveIndex) ;
+		const left = Math.ceil( (freq - octaveLow) / (octaveHigh - octaveLow)  *  this.canvasContext.canvas.width );
+
+		// Draw line
+		this.canvasContext.strokeStyle = Organ.keys[i].isDown ? "hsl( 355, 78%, 40% )" : "rgb( 82, 121, 123 )";
+		this.canvasContext.beginPath();
+		this.canvasContext.moveTo(left, top - 5);
+		this.canvasContext.lineTo(left, top - height + 5);
+		this.canvasContext.stroke();
+
+		// Draw text
+		this.canvasContext.font = "Georgia";
+		this.canvasContext.fillStyle = "rgb( 128, 203, 196 )";
+		this.canvasContext.fillText( freq.toFixed(0) + " Hz", left + 5, top - 5);
 
 	}
 
