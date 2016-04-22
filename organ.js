@@ -26,12 +26,12 @@ var Organ = {
 		
 		this.tremoloFreq.type = "sine";
 		this.tremoloFreq.frequency.value = 10;
-		this.tremoloFreq.start();
+		//this.tremoloFreq.start();
 		this.tremoloDepth.gain.value = .2;
 		this.tremoloNode.gain.value = 1.0;
 
 		this.tremoloFreq.connect(this.tremoloDepth);
-		this.tremoloDepth.connect(this.tremoloNode.gain);
+		//this.tremoloDepth.connect(this.tremoloNode.gain);
 		this.tremoloNode.connect(this.output);
 
 

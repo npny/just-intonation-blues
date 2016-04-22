@@ -74,7 +74,7 @@
 <script>
 	const context = new (window.AudioContext || window.webkitAudioContext)();
 	context.masterOut = context.createGain();
-	context.masterOut.gain.value = .1;
+	context.masterOut.gain.value = 1.3;
 	context.masterOut.connect(context.destination);
 </script>
 
@@ -83,6 +83,8 @@
 <script type="text/javascript" src="organ.js"></script>
 <script type="text/javascript" src="ui.js"></script>
 <script type="text/javascript" src="spectrogram.js"></script>
+<script type="text/javascript" src="leslie-speaker.js"></script>
+<script type="text/javascript" src="reverb.js"></script>
 
 <script>
 
@@ -93,8 +95,6 @@
 		analyserNode.fftSize = Math.pow(2, 11); // 10-15
 		analyserNode.smoothingTimeConstant = .0//01;//0.0001;
 
-		//Organ.output.connect(analyserNode);
-
 		const canvas = document.getElementById("canvas");
 		canvas.height = canvas.clientHeight;
 		canvas.width = canvas.clientWidth;
@@ -104,7 +104,7 @@
 		navigator.getUserMedia_ = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 		navigator.getUserMedia_({audio: true}, function(stream) {
 			context.masterIn = context.createMediaStreamSource(stream);
-			//context.masterIn.connect(analyserNode);
+			context.masterIn.connect(analyserNode);
 		}, e => console.log(e));
 		*/
 		
@@ -114,9 +114,20 @@
 		dummyOscillator.connect(analyserNode);
 		context.masterOut.connect(analyserNode);
 
+		
 		Organ.init();
 		Organ.setScale(minorBluesScale_Just2);
-		Organ.output.connect(context.masterOut);
+		LeslieSpeaker.init();
+		const reverb = new SimpleReverb(context, {seconds: .07, decay: 1, reverse: 0});
+		
+		Organ.output.connect(LeslieSpeaker.input);
+		LeslieSpeaker.output.connect(reverb.input);
+		reverb.connect(context.masterOut)
+
+		//Organ.output.connect(reverb.input);		
+		//LeslieSpeaker.output.connect(context.masterOut);
+		//reverb.output.connect(context.masterOut);
+
 
 		UI.setBaseNoteIndex(12);
 
