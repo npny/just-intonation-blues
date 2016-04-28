@@ -118,10 +118,11 @@
 		Organ.init();
 		Organ.setScale(minorBluesScale_Just2);
 		LeslieSpeaker.init();
-		const reverb = new SimpleReverb(context, {seconds: .07, decay: 1, reverse: 0});
+		const reverb = new SimpleReverb(context, {seconds: .25, decay: 1, reverse: 0});
 		
 		Organ.output.connect(LeslieSpeaker.input);
 		LeslieSpeaker.output.connect(reverb.input);
+		LeslieSpeaker.output.connect(context.masterOut);
 		reverb.connect(context.masterOut)
 
 		//Organ.output.connect(reverb.input);		
