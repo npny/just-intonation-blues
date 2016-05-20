@@ -9,30 +9,14 @@
 			height: 100vh;
 		}
 
-		#controls {
-			display: flex;
-			justify-content: center;
-			margin-top: 20px;
-		}
-
-		#controls select {
-			width: 100%;
-		}
-
-		#controls > div:first-child {
-			width: 200px;
-			display: flex;
-			justify-content: center;
-			flex-direction: column;
-		}
-
-		#controls > div:first-child > div {
-			display: flex;
-		}
-
 		#tonality-input {width: 6em;}
 		#output-volume {
-			width: 100%;
+			position: absolute;
+			bottom: 0px;
+			left: 0px;
+			transform: rotate(-90deg);
+			width: 50vh;
+			transform-origin: 0px 0px 0px;
 		}
 
 		#canvas {
@@ -63,12 +47,8 @@
 <body>
 
 <table id="frequency-pad"></table>
-
 <canvas id="canvas" width="100vw"></canvas>
-
-<div id="controls">
-	<input type="range" id="output-volume" value=".1"/>
-</div>
+<input type="range" id="output-volume"/>
 
 
 
@@ -100,6 +80,11 @@
 
 		const gain = context.createGain();
 		gain.gain.value = .3;
+
+		const dummy = context.createOscillator();
+		dummy.frequency.value = 0;
+		dummy.connect(context.masterOut);
+		dummy.start();
 
 		Organ.output.connect(SimpleLeslie.input);
 		SimpleLeslie.output.connect(gain);
