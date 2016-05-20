@@ -39,7 +39,7 @@ var Organ = {
 		this.keys = [];
 		for(var row = 0; row < 4; row++)
 			for(var col = 0; col < 12; col++) {
-				const key = new Key();
+				const key = window.fastMode ? new SimpleKey() : new Key();
 				key.output.connect(this.tremoloNode);
 				this.keys.push(key);
 			}

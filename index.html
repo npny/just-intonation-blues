@@ -38,6 +38,7 @@
 		#canvas {
 			width: 100vw;
 			height: 100vh;
+			background: rgb( 38, 50, 56 );
 		}
 
 		#frequency-pad {
@@ -86,9 +87,29 @@
 <script type="text/javascript" src="leslie-speaker.js"></script>
 <script type="text/javascript" src="reverb.js"></script>
 
+<script type="text/javascript" src="simple-key.js"></script>
+<script type="text/javascript" src="simple-leslie-speaker.js"></script>
+
 <script>
 
-	function init() {
+	function initSimple() {
+
+		Organ.init();
+		Organ.setScale(minorBluesScale_Just2);
+		SimpleLeslie.init();
+
+		const gain = context.createGain();
+		gain.gain.value = .3;
+
+		Organ.output.connect(SimpleLeslie.input);
+		SimpleLeslie.output.connect(gain);
+		gain.connect(context.masterOut);
+
+		UI.setBaseNoteIndex(12);
+
+	}
+
+	function initFull() {
 
 		const analyserNode = context.createAnalyser();
 		window.analyserNode = analyserNode;
@@ -135,7 +156,8 @@
 
 	}
 
-	init();
+	window.fastMode = /\?fast/.test(location);
+	window.fastMode ? initSimple() : initFull();
 
 </script>
 

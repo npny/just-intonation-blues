@@ -50,6 +50,7 @@ const UI = {
 		Organ.setBaseFrequency(baseFrequency);
 		//updateFreqDisplay();
 		//updateSpectr();
+		if(!window.spectrogram) return;
 		window.spectrogram.baseFrequency = baseFrequency;
 		window.spectrogram.recomputeDrawRects();
 
